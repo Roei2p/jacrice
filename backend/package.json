@@ -1,0 +1,14 @@
+{
+  "name": "jacrice-whatsapp-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local-only backend for sending WhatsApp messages via Green API. Runs on your machine; credentials never leave it and are never committed.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "send": "node send.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
