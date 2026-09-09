@@ -267,9 +267,12 @@
   .sys-desc{ font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
   .sys-agents{ display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
   .sys-agent-chip{ font-family: var(--font-display); font-size: 9px; color: var(--text-dim); border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
-  .sys-status{ font-size: 11px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; flex: none; }
+  .sys-need{ font-size: 10.5px; color: var(--text-dim); margin-top: 5px; line-height: 1.5; }
+  .sys-need b{ color: var(--text-muted); font-weight: 600; }
+  .sys-status{ font-size: 11px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; flex: none; text-align: center; }
   .sys-status.connected{ background: var(--success-soft); color: var(--success); }
-  .sys-status.pending{ background: var(--surface); color: var(--text-dim); border: 1px solid var(--border); }
+  .sys-status.connector{ background: var(--surface); color: var(--text-dim); border: 1px solid var(--border); }
+  .sys-status.apikey{ background: var(--warning-soft); color: var(--warning); }
 
   .drive-list{ display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
   .drive-item{ display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 9px; background: var(--surface); border: 1px solid var(--border-soft); border-radius: 8px; font-size: 12px; }
@@ -449,7 +452,7 @@
     </div>
   </div>
 
-  <footer>מקור האמת היחיד לנתוני תיק הוא Smart-NPV — סתירה בין מערכות נעצרת ומדווחת, לא מוכרעת לבד. מבוסס על "צוות ה-AI של סיגל בורה — מפרט מלא" מהדרייב.</footer>
+  <footer>מקור האמת היחיד לנתוני תיק הוא Smart-NPV — סתירה בין מערכות נעצרת ומדווחת, לא מוכרעת לבד. מבוסס על "צוות ה-AI של סיגל בורה — מפרט מלא" מהדרייב.<br>הריפו jacrice ציבורי — אף מפתח API אמיתי לא נשמר כאן בקוד; חיבורים אמיתיים יחייבו שכבת שרת נפרדת שמחזיקה את המפתחות.</footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -471,21 +474,28 @@
   ];
 
   var SYSTEMS = [
-    { name: "WhatsApp Business API", desc: "ערוץ ראשי — חלון 24 שעות, תבניות מאושרות מחוץ לחלון", agents: [0,1,3,4], status: "pending",
+    { name: "WhatsApp Business API", desc: "ערוץ ראשי — חלון 24 שעות, תבניות מאושרות מחוץ לחלון", agents: [0,1,3,4], status: "apikey",
+      need: "Green API — Instance ID + Token, ואישור 8 תבניות מול Meta",
       icon: '<path d="M4 20l1.4-4A8 8 0 1 1 9 19z"/><path d="M9 10c0 3 2 5 5 5"/>' },
     { name: "Google Drive", desc: "מסמכים וסיכומי שיחות", agents: [1,2,3], status: "connected",
       icon: '<path d="M8 3h8l6 10-4 7H6l-4-7z"/><path d="M8 3l6 10M12 20l4-7H6"/>' },
-    { name: "Google Calendar", desc: "יומן פגישות, מרווח 20 דק׳", agents: [1,2,3], status: "pending",
+    { name: "Google Calendar", desc: "יומן פגישות, מרווח 20 דק׳", agents: [1,2,3], status: "connector",
+      need: "לחבר את מחבר Google Calendar בהגדרות Claude",
       icon: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>' },
-    { name: "Google Meet", desc: "הקלטה ותמלול שיחות אבחון", agents: [1], status: "pending",
+    { name: "Google Meet", desc: "הקלטה ותמלול שיחות אבחון", agents: [1], status: "connector",
+      need: "נגזר מחיבור Google Calendar / Workspace",
       icon: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>' },
-    { name: "Smart-NPV", desc: "תיק לקוח — מקור האמת היחיד", agents: [1,2,3,6], status: "pending",
+    { name: "Smart-NPV", desc: "תיק לקוח — מקור האמת היחיד", agents: [1,2,3,6], status: "apikey",
+      need: "מפתח API מהספק — סיגל צריכה לפנות לתמיכה של Smart-NPV",
       icon: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M7 13h5M7 17h9"/>' },
-    { name: "base44", desc: "טופס לידים באתר ומגנטי לידים", agents: [1,5], status: "pending",
+    { name: "base44", desc: "טופס לידים באתר ומגנטי לידים", agents: [1,5], status: "apikey",
+      need: "מפתח API של טופס הלידים מ-base44",
       icon: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/>' },
-    { name: "מייל עסקי", desc: "סיכומים רשמיים ללקוח", agents: [1,3], status: "pending",
+    { name: "מייל עסקי", desc: "סיכומים רשמיים ללקוח", agents: [1,3], status: "connector",
+      need: "לחבר את מחבר Gmail בהגדרות Claude (טרם קיים בחשבון)",
       icon: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>' },
-    { name: "SMS", desc: "תזכורות גיבוי", agents: [1,3], status: "pending",
+    { name: "SMS", desc: "תזכורות גיבוי", agents: [1,3], status: "apikey",
+      need: "ספק SMS (למשל inforu / 019) + מפתח API",
       icon: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>' }
   ];
 
@@ -585,10 +595,11 @@
   }
   renderTeam();
 
+  var SYS_STATUS_LABEL = { connected: "מחובר ✓", connector: "ניתן לחבר ב-Claude", apikey: "ממתין למפתחות API" };
   function renderSystems(){
     els.systemsGrid.innerHTML = SYSTEMS.map(function(s){
       var chips = s.agents.map(function(n){ return '<span class="sys-agent-chip">סוכן ' + n + '</span>'; }).join("");
-      var statusLabel = s.status === "connected" ? "מחובר ✓" : "טרם מחובר";
+      var statusLabel = SYS_STATUS_LABEL[s.status] || "טרם מחובר";
       return '' +
         '<div class="system-row">' +
           '<div class="sys-icon"><svg viewBox="0 0 24 24">' + s.icon + '</svg></div>' +
@@ -596,6 +607,7 @@
             '<div class="sys-name-row"><span class="sys-name">' + esc(s.name) + '</span></div>' +
             '<div class="sys-desc">' + esc(s.desc) + '</div>' +
             '<div class="sys-agents">' + chips + '</div>' +
+            (s.need ? '<div class="sys-need"><b>נדרש:</b> ' + esc(s.need) + '</div>' : '') +
             (s.name === "Google Drive" ? '<div class="drive-list" id="drive-list"><div class="empty-state" style="padding:6px 0">טוען מסמכים אחרונים…</div></div>' : '') +
           '</div>' +
           '<div class="sys-status ' + s.status + '">' + statusLabel + '</div>' +
